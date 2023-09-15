@@ -38,18 +38,9 @@ RUN source ./gpgpu-sim_distribution/setup_environment \
     && make -j $(nproc) \
     && make install
 
-# Run commands in shell script
-RUN echo "source /gpgpu-sim_distribution/setup_environment \
-    && /sstcore-install/bin/sst-test-elements -p /sst-elements/src/sst/elements/balar/tests" > /run_sst_test.sh
-RUN echo "source /gpgpu-sim_distribution/setup_environment \
-    && cd /sst-elements/src/sst/elements/balar/tests/ \
-    && make -C vectorAdd \
-    && /sstcore-install/bin/sst testBalar-testcpu.py --model-options='-c gpu-v100-mem.cfg -v -x ./vectorAdd/vectorAdd -t ./vectorAdd/cuda_calls.trace'" > /run_trace_mode.sh
-RUN echo "source /gpgpu-sim_distribution/setup_environment \
-    && cd /sst-elements/src/sst/elements/balar/tests/ \
-    && /sstcore-install/bin/sst testBalar-vanadis.py --model-options='-c gpu-v100-mem.cfg'" > /run_vanadis_mode.sh
-RUN chmod +x /run_sst_test.sh 
-RUN chmod +x /run_trace_mode.sh 
+# Prep for demo
+RUN apt-get install -y xxd
 
-# Need to fix vanadis mode later
-# RUN chmod +x /run_vanadis_mode.sh 
+# Run commands in shell script
+COPY --chmod=777 run_sst_test.sh run_trace_mode.sh \
+                 run_vanadis_mode.sh show_traces.sh /
