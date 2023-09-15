@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Docker login
+      run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{secrets.DOCKER_TOKEN}}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag williammtk/sst_balar_demo:latest
+    - name: Test Balar with SST testsuite
+      run: docker run williammtk/sst_balar_demo ./run_sst_test.sh
+    - name: Push to dockerhub
+      run: |
+        docker tag williammtk/sst_balar_demo williammtk/sst_balar_demo
+        docker push williammtk/sst_balar_demo
